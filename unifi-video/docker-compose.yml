@@ -1,0 +1,31 @@
+version: '3'
+services:
+  unifi-video-controller:
+    build: .
+    container_name: unifi-video
+    image: unifi-video-controller
+    ports:
+      - 1935:1935
+      - 6666:6666
+      - 7004:7004
+      - 7080:7080
+      - 7442:7442
+      - 7443:7443
+      - 7444:7444
+      - 7445:7445
+      - 7446:7446
+      - 7447:7447
+    volumes:
+      - UnifiVideoDataVolume:/var/lib/unifi-video
+      - S:/unifi-video-controller/data/keystore:/var/lib/unifi-video/keystore
+      - S:/unifi-video-controller/data/system.properties:/var/lib/unifi-video/system.properties
+      - D:/Surveillance:/var/lib/unifi-video/videos
+      - S:/unifi-video-controller/log:/var/log/unifi-video
+    cap_add:
+      - SYS_ADMIN
+      - DAC_READ_SEARCH
+      - IPC_LOCK
+    entrypoint: /run.sh
+
+volumes:
+  UnifiVideoDataVolume:

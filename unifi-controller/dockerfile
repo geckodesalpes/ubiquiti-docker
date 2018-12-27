@@ -1,0 +1,44 @@
+FROM phusion/baseimage:0.11
+MAINTAINER admin@lesecureuils.xyz
+
+# Version
+ENV version 5.6.40
+
+# Set envs for sub system
+ENV HOME /root
+ENV DEBIAN_FRONTEND noninteractive
+ENV LC_ALL C.UTF-8
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US.UTF-8
+
+ADD run.sh /run.sh
+
+# Run all commands
+RUN apt-get update && \
+  apt-get install -y binutils &&\
+  apt-get install -y apt-utils && \
+  apt-get upgrade -y -o Dpkg::Options::="--force-confold" && \
+  apt-get install -y wget sudo moreutils patch tzdata && \
+  apt-get install -y openjdk-8-jre-headless jsvc
+
+# Add mongodb 3.4 repo and install
+RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 0C49F3730359A14518585931BC711F9BA15703C6 && \
+  echo "deb [ arch=amd64,arm64 ] http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.4 multiverse" > /etc/apt/sources.list.d/mongodb-org-3.4.list && \
+  apt-get update && apt-get install -y mongodb-org-server
+
+# Get and intall unifi network controller
+RUN wget -q -O unifi-controller.deb https://dl.ubnt.com/unifi/${version}/unifi_sysvinit_all.deb && \
+  dpkg -i unifi-controller.deb && \
+  rm /unifi-controller.deb
+
+#RUN chmod 755 /run.sh
+
+# Configuration and database volume
+#VOLUME ["/var/lib/unifi"]
+
+# Video storage volume
+#VOLUME ["/var/log/unifi"]
+
+EXPOSE 6789/tcp 8080/tcp 8443/tcp 8880/tcp 8843/tcp 3478/udp
+
+#ENTRYPOINT ["/run.sh"]
